@@ -62,8 +62,7 @@ def main() -> None:
     )
 
     active_run = mlflow.active_run()
-    run_ctx = mlflow.start_run(run_name="rf_baseline", nested=active_run is not None)
-    with run_ctx:
+    if active_run is not None:
         model.fit(X_train, y_train)
         preds = model.predict(X_test)
         probas = model.predict_proba(X_test)[:, 1]
@@ -71,6 +70,15 @@ def main() -> None:
         mlflow.log_metric("test_accuracy", float(accuracy_score(y_test, preds)))
         mlflow.log_metric("test_f1", float(f1_score(y_test, preds)))
         mlflow.log_metric("test_roc_auc", float(roc_auc_score(y_test, probas)))
+    else:
+        with mlflow.start_run(run_name="rf_baseline"):
+            model.fit(X_train, y_train)
+            preds = model.predict(X_test)
+            probas = model.predict_proba(X_test)[:, 1]
+
+            mlflow.log_metric("test_accuracy", float(accuracy_score(y_test, preds)))
+            mlflow.log_metric("test_f1", float(f1_score(y_test, preds)))
+            mlflow.log_metric("test_roc_auc", float(roc_auc_score(y_test, probas)))
 
 
 if __name__ == "__main__":
