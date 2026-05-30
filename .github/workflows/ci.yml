@@ -49,15 +49,20 @@ jobs:
           name: mlruns
           path: MLProject/mlruns
 
+      - name: Validate Docker Hub secrets
+        run: |
+          if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
+            echo "Docker Hub secrets are missing. Set DOCKERHUB_USERNAME and DOCKERHUB_TOKEN in repo secrets." >&2
+            exit 1
+          fi
+
       - name: Log in to Docker Hub
-        if: ${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}
         uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: Build MLflow model image
-        if: ${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}
         run: |
           RUN_DIR=$(find MLProject/mlruns -mindepth 2 -maxdepth 2 -type d -print0 | xargs -0 ls -td | head -n 1)
           RUN_ID=$(basename "$RUN_DIR")
