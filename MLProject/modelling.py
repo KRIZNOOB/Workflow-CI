@@ -61,7 +61,9 @@ def main() -> None:
         n_jobs=-1,
     )
 
-    with mlflow.start_run(run_name="rf_baseline"):
+    active_run = mlflow.active_run()
+    run_ctx = mlflow.start_run(run_name="rf_baseline", nested=active_run is not None)
+    with run_ctx:
         model.fit(X_train, y_train)
         preds = model.predict(X_test)
         probas = model.predict_proba(X_test)[:, 1]
