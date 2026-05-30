@@ -63,8 +63,11 @@ jobs:
           password: ${{ env.DOCKERHUB_TOKEN }}
 
       - name: Build MLflow model image
+        working-directory: MLProject
+        env:
+          MLFLOW_TRACKING_URI: file:./mlruns
         run: |
-          RUN_DIR=$(find MLProject/mlruns -mindepth 2 -maxdepth 2 -type d -print0 | xargs -0 ls -td | head -n 1)
+          RUN_DIR=$(find mlruns -mindepth 2 -maxdepth 2 -type d -print0 | xargs -0 ls -td | head -n 1)
           RUN_ID=$(basename "$RUN_DIR")
           mlflow models build-docker -m "runs:/$RUN_ID/model" -n "$IMAGE_NAME"
           docker push "$IMAGE_NAME"
