@@ -68,6 +68,7 @@ def main() -> None:
     mlflow.log_metric("test_accuracy", float(accuracy_score(y_test, preds)))
     mlflow.log_metric("test_f1", float(f1_score(y_test, preds)))
     mlflow.log_metric("test_roc_auc", float(roc_auc_score(y_test, probas)))
+    mlflow.sklearn.log_model(model, "model")
 
 
 if __name__ == "__main__":
