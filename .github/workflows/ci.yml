@@ -66,8 +66,9 @@ jobs:
         working-directory: MLProject
         env:
           MLFLOW_TRACKING_URI: file:./mlruns
+          MLFLOW_DOCKER_IMAGE: python:3.12-slim
         run: |
           RUN_DIR=$(find mlruns -mindepth 2 -maxdepth 2 -type d -print0 | xargs -0 ls -td | head -n 1)
           RUN_ID=$(basename "$RUN_DIR")
-          mlflow models build-docker -m "runs:/$RUN_ID/model" -n "$IMAGE_NAME"
+          mlflow models build-docker -m "runs:/$RUN_ID/model" -n "$IMAGE_NAME" --env-manager=local
           docker push "$IMAGE_NAME"
